@@ -47,6 +47,8 @@
           <li><a href="#services">Services</a></li>
           <li><a href="#pricing">Penerbangan</a></li>
           <li><a href="#contact">Contact</a></li>
+          <li><a href="login.php">Login</a></li>
+          <li><a href="register.php">Register</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
