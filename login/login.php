@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (login($username, $password)) {
         $_SESSION['username'] = $username;
-        header("Location: ../index.php");
+        header("Location: ../dashboard.php");
     } else {
         $_SESSION['error'] = "Username atau password salah!";
     }
