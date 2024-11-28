@@ -1,3 +1,20 @@
+<?php
+session_start();
+
+// Cek jika pengguna belum login
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php'); // Arahkan ke halaman login jika belum login
+    exit;
+}
+
+// Otorisasi: Jika role pengguna tidak sesuai, tolak akses
+if ($_SESSION['role'] !== 'admin') { // Ganti 'admin' sesuai kebutuhan
+    echo "<h1>Akses ditolak</h1>";
+    echo "<p>Anda tidak memiliki izin untuk mengakses halaman ini.</p>";
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,10 +81,10 @@
         <a href="settings.php">Settings</a>
         <a href="reports.php">Reports</a>
         <a href="CRUD/index.php">Manajemen Tiket</a>
-
     </div>
     <div class="main-content">
         <h1>Welcome to the Dashboard</h1>
+        <p>Hello, <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong>!</p>
         <p>This is your dashboard where you can manage your application.</p>
         <p>Use the sidebar to navigate to other sections.</p>
     </div>
@@ -76,4 +93,3 @@
     </footer>
 </body>
 </html>
-

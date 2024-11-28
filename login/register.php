@@ -1,16 +1,23 @@
 <?php
-session_start();
-include '../includes/functions.php';
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    include '../includes/db_connect.php';
+
     $username = $_POST['username'];
     $password = $_POST['password'];
+    $role = $_POST['role'];
 
-    if (register($username, $password)) {
-        $_SESSION['message'] = "Registrasi berhasil!";
-        header("Location: login.php");
+    // Hash password
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+    $sql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $username, $hashed_password, $role);
+    if ($stmt->execute()) {
+        // Setelah registrasi berhasil, redirect ke halaman login
+        header('Location: login.php'); 
+        exit; // Hentikan eksekusi skrip untuk memastikan redirect bekerja
     } else {
-        $_SESSION['error'] = "Registrasi gagal!";
+        echo "Error: " . $conn->error;
     }
 }
 ?>
@@ -19,15 +26,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Registrasi</title>
+    <title>Registrasi Pengguna</title>
 </head>
 <body>
-    <h2>Registrasi</h2>
+    <h1>Registrasi Pengguna Baru</h1>
     <form method="POST">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br>
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br>
+        <label>Role:</label><br>
+        <select name="role" required>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+        </select><br><br>
         <button type="submit">Daftar</button>
     </form>
-    <p>Sudah punya akun? <a href="login.php">Login di sini</a></p>
 </body>
 </html>

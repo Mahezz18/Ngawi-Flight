@@ -1,16 +1,41 @@
 <?php
 session_start();
-include '../includes/functions.php';
+
+// Cek jika pengguna sudah login
+if (isset($_SESSION['user_id'])) {
+    header('Location: ../dashboard.php'); // Arahkan ke dashboard jika sudah login
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    include '../includes/db_connect.php';
+
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    if (login($username, $password)) {
-        $_SESSION['username'] = $username;
-        header("Location: ../dashboard.php");
+    // Validasi pengguna
+    $sql = "SELECT * FROM users WHERE username = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        // Verifikasi password
+        if (password_verify($password, $user['password'])) {
+            // Set session jika login sukses
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
+            header('Location: ../dashboard.php'); // Arahkan ke dashboard
+            exit;
+        } else {
+            $error = "Password salah!";
+        }
     } else {
-        $_SESSION['error'] = "Username atau password salah!";
+        $error = "Pengguna tidak ditemukan!";
     }
 }
 ?>
@@ -22,12 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Login</title>
 </head>
 <body>
-    <h2>Login</h2>
+    <h1>Login</h1>
+    <?php if (isset($error)) { echo "<p>$error</p>"; } ?>
     <form method="POST">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br>
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br><br>
         <button type="submit">Login</button>
     </form>
-    <p>Belum punya akun? <a href="register.php">Daftar di sini</a></p>
 </body>
 </html>
